@@ -130,7 +130,7 @@ const navigation = useNavigation();
 
         </View>
         <View style={{alignItems: "center",justifyContent: "center",padding: 10, marginTop: 20}}>
-            <Text style={{fontSize: 14,lineHeight: 14,fontFamily: "Poppins-Regular",color: "#7c36cf"}}>ou</Text>
+            <Text style={{fontSize: 14,lineHeight: 14,fontFamily: "Poppins_400Regular",color: "#7c36cf"}}>ou</Text>
         </View>
 
         <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-evenly',marginTop:20, marginBottom:40}}>
