@@ -38,34 +38,42 @@ const CardMotorista: React.FC<CardMotoristaProps> = ({
 
   return (
     <View style={styles.card}>
+
       <Image source={{ uri: foto }} style={styles.foto} />
+
       <View style={styles.info}>
         <Text style={styles.nome}>{nome}</Text>
         <Text style={styles.texto}>Destino: {destino}</Text>
         <Text style={styles.texto}>Setor: {setor}</Text>
         <Text style={styles.texto}>Tempo de Encontro: {tempoEncontro}</Text>
+
         {solicitacaoAceita && (
           <Text style={[styles.texto, { color: 'green', fontWeight: 'bold' }]}>
             Solicitação Aceita!
           </Text>
         )}
+
         {solicitacaoNegada && (
           <Text style={[styles.texto, { color: 'red', fontWeight: 'bold' }]}>
             Solicitação Negada!
           </Text>
         )}
+
         {!solicitacaoAceita && !solicitacaoNegada && (
           <View>
             {confirmacaoVisible ? (
               <View style={styles.confirmacaoContainer}>
                 <Text style={styles.confirmacaoTexto}>Gostaria de aceitar essa solicitação?</Text>
+
                 <View style={styles.botoesContainer}>
                   <TouchableOpacity onPress={handleAceitar} style={[styles.botao, styles.botaoAceitar]}>
                     <Text style={styles.textoBotao}>Aceitar</Text>
                   </TouchableOpacity>
+
                   <TouchableOpacity onPress={handleNegar} style={[styles.botao, styles.botaoNegar]}>
                     <Text style={styles.textoBotao}>Negar</Text>
                   </TouchableOpacity>
+
                 </View>
               </View>
             ) : (
@@ -73,6 +81,7 @@ const CardMotorista: React.FC<CardMotoristaProps> = ({
                 <Text style={styles.textoBotao}>Gostaria de aceitar essa solicitação?</Text>
               </TouchableOpacity>
             )}
+
           </View>
         )}
       </View>
@@ -117,7 +126,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 5,
     marginTop: 10,
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   confirmacaoContainer: {
     marginTop: 10,
@@ -127,6 +136,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
+    alignItems:'flex-start',
   },
   botoesContainer: {
     flexDirection: 'row',
@@ -148,7 +158,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#d9534f', // Vermelho
   },
   textoBotao: {
-    color: 'white',
+    color: '#6000AC',
     fontWeight: 'bold',
   },
 });

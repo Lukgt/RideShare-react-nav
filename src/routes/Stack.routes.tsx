@@ -9,6 +9,8 @@ import { CadastroMScreen } from '../screens/CadastroMScreen';
 import { CadastroC2Screen } from '../screens/CadastroC2Screen';
 import { CadastroM2Screen } from '../screens/CadastroM2Screen';
 import { BottomTabsRotues } from './Bottom-tab.routes';
+import { ModalCScreen } from '../screens/ModalCSreen';
+import { ModalMScreen } from '../screens/ModalMSreen';
 
 const { Screen, Navigator} = createStackNavigator();
 
@@ -68,6 +70,20 @@ export function StackRoutes(){
             <Screen
                 name='home'
                 component={BottomTabsRotues}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Screen
+                name='modalC'
+                component={ModalCScreen}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Screen
+                name='modalM'
+                component={ModalMScreen}
                 options={{
                     headerShown: false
                 }}

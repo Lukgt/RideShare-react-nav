@@ -1,15 +1,20 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ScrollView, View, Text, Image, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useNavigation } from '@react-navigation/native';
 import { BotaoCarona, BotaoMotorista } from '../components/BotaoHome';
 import { BotaoPrincipal } from '../components/Botao';
+
 import CardCarona from '../components/CardCarona';
 import CardMotorista from '../components/CardMotorista';
 
+import { Modalize } from 'react-native-modalize';
+import ModalCarona from '../components/ModalCarona';
+import ModalMotorista from '../components/ModalMotorista';
+
 export function HomeScreen() {
   const [formType, setFormType] = useState('carona'); // Estado inicial: 'carona' selecionado
-  const [dataPartida, setDataPartida] = useState('');
-  const [horaPartida, setHoraPartida] = useState('');
+  const navigation = useNavigation();
   const [numAssentos, setNumAssentos] = useState(0); // Estado inicial do número de assentos
 
   const incrementarAssentos = () => {
@@ -24,6 +29,14 @@ export function HomeScreen() {
     }
   };
 
+// Modal dos Cards
+  const modalizeRef = useRef<Modalize>(null);
+
+  const onOpen = () => {
+    modalizeRef.current?.open();
+  };
+
+// Troca de tela dos botoes
   const renderForm = () => {
     if (formType === 'carona') {
       return (
@@ -93,6 +106,7 @@ export function HomeScreen() {
     }
   };
 
+  //corpo principal
   return (
     <ScrollView style={{ flex: 1, backgroundColor: 'white' }}>
       <View style={styles.header}>
@@ -128,13 +142,20 @@ export function HomeScreen() {
       </View>
 
       <View style={{alignItems:'center', justifyContent: 'center', marginBottom: 20, marginTop:20}}>
-        <CardCarona foto={''} nome={''} destino={''} distancia={''} tempoChegada={''} placa={''} modeloCarro={''} assentosDisponiveis={0}      
-        />
+
+        <TouchableOpacity onPress={() => navigation.navigate('modalC')}>
+          <CardCarona foto={''} nome={''} destino={''} distancia={''} tempoChegada={''} placa={''} modeloCarro={''} assentosDisponiveis={0}      
+          />
+        </TouchableOpacity>
+
       </View>
       
       <View style={{alignItems:'center', justifyContent: 'center', marginBottom: 20, marginTop:10}}>
+      
+      <TouchableOpacity onPress={() => navigation.navigate('modalM')}>
+        <CardMotorista foto={''} nome={''} destino={''} setor={''} tempoEncontro={''}/>
+      </TouchableOpacity>
 
-      <CardMotorista foto={''} nome={''} destino={''} setor={''} tempoEncontro={''}/>
 
       </View>
 
@@ -201,13 +222,11 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderColor: '#cdced7',
     borderWidth: 1,
-    width: '100%',
+    width: '85%',
     height: 50,
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    minWidth: 343,
-    maxWidth: 343,
     marginHorizontal: 32,
   },
   input2: {
@@ -216,7 +235,7 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderColor: '#cdced7',
     borderWidth: 1,
-    width: 166,
+    width: '45%',
     height: 50,
     flexDirection: 'row',
     alignItems: 'center',
