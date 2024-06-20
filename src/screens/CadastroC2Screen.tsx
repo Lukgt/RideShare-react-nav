@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { ScrollView, View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { BotaoPrincipal } from '../components/Botao';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
-import * as ImagePicker from 'expo-image-picker'; // Importar ImagePicker do Expo
-
+import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins';
+import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function CadastroC2Screen() {
   const [logradouro, setLogradouro] = useState('');
@@ -16,46 +16,99 @@ export function CadastroC2Screen() {
   const [uf, setUF] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmSenha, setConfirmSenha] = useState('');
-  const [imagemDocumento, setImagemDocumento] = useState<string | null>(null); // Estado para armazenar a URI da imagem
+  const [imagemDocumento, setImagemDocumento] = useState<string | null>(null);
 
-
-   const[fontsLoad]=useFonts({
-    Poppins_400Regular, 
-    Poppins_500Medium, 
-    Poppins_600SemiBold, 
-    Poppins_700Bold, 
-    Poppins_800ExtraBold 
-   });
- 
-   if(!fontsLoad){
-    return null;
-   }
+  const [fontsLoad] = useFonts({
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+    Poppins_800ExtraBold
+  });
 
   const navigation = useNavigation();
 
-  // Função para lidar com a seleção de imagem
+  if (!fontsLoad) {
+    return null;
+  }
+
   const handleEscolherDocumento = async () => {
     let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (permissionResult.granted === false) {
-      alert('Permissão para acessar a galeria é necessária!');
+      Alert.alert('Permissão necessária', 'Permissão para acessar a galeria é necessária!');
       return;
     }
 
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Apenas imagens são permitidas
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
     if (!pickerResult.cancelled) {
-      setImagemDocumento(pickerResult.uri); // Armazena a URI da imagem selecionada
+      setImagemDocumento(pickerResult.uri);
+    }
+  };
+
+  const handleSubmit = async () => {
+    console.log("Iniciando o envio dos dados");
+    const cadastroParte1 = await AsyncStorage.getItem('cadastroParte1');
+    if (!cadastroParte1) {
+      Alert.alert('Erro', 'Dados da primeira etapa não encontrados. Por favor, complete a primeira etapa novamente.');
+      navigation.navigate('cadastroC');
+      return;
+    }
+
+    const cadastroCompleto = {
+      ...JSON.parse(cadastroParte1),
+      logradouro,
+      numero,
+      bairro,
+      cidade,
+      uf,
+      senha,
+      confirmSenha,
+    };
+    console.log("Dados do cadastroCompleto:", cadastroCompleto);
+
+    try {
+      const response = await fetch('https://backend-rideshare.onrender.com/user/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(cadastroCompleto),
+      });
+
+      const textResponse = await response.text();
+
+      try {
+        const responseData = JSON.parse(textResponse);
+        if (response.ok) {
+          await AsyncStorage.removeItem('cadastroParte1');
+          console.log("Cadastro completo com sucesso");
+          Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+          navigation.navigate('login');
+        } else {
+          console.error("Erro ao cadastrar:", responseData);
+          Alert.alert('Erro', `Não foi possível completar o cadastro: ${responseData.msg || 'Erro desconhecido'}`);
+        }
+      } catch (error) {
+        console.error("Erro ao parsear a resposta JSON:", error, textResponse);
+        Alert.alert('Erro', 'Não foi possível completar o cadastro. Tente novamente mais tarde.');
+      }
+    } catch (error) {
+      console.error("Erro ao enviar os dados:", error);
+      Alert.alert('Erro', 'Não foi possível completar o cadastro. Tente novamente.');
     }
   };
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+      <StatusBar style="auto" />
+
       <View style={{ alignItems: 'center', justifyContent: 'center', marginBottom: 40, backgroundColor: '#6000AC', height: 134 }}>
         <MaterialCommunityIcons
           name="arrow-left"
@@ -93,27 +146,26 @@ export function CadastroC2Screen() {
           />
         </View>
 
-        {/* Componente para escolher o documento */}
-            <View style={{alignItems:'center', justifyContent:'center', marginTop:20}}>
-                <Text style={styles.identificacao}>Identificação</Text>
-                <Text style={styles.identificacaoSub}>
-                    Nessa etapa faça upload de um documento de identificação com foto. O tamanho total de cada arquivo não pode
-                    ultrapassar 5 MB.
-                </Text>
-            </View>
-          <TouchableOpacity onPress={handleEscolherDocumento} style={{ alignItems: 'center', justifyContent: 'center'}}>
-            <View>
-                {imagemDocumento && <Image source={{ uri: imagemDocumento }} style={{ width: 200, height: 200 }} />}
-                <Text style={{backgroundColor:'#d8d9e0', padding:15, borderColor:'#8b8d98', borderRadius:5, borderWidth:1 }}>Selecione arquivo...</Text>
-            </View>
+        <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+          <Text style={styles.identificacao}>Identificação</Text>
+          <Text style={styles.identificacaoSub}>
+            Nessa etapa faça upload de um documento de identificação com foto. O tamanho total de cada arquivo não pode
+            ultrapassar 5 MB.
+          </Text>
+        </View>
+        <TouchableOpacity onPress={handleEscolherDocumento} style={{ alignItems: 'center', justifyContent: 'center' }}>
+          <View>
+            {imagemDocumento && <Image source={{ uri: imagemDocumento }} style={{ width: 200, height: 200 }} />}
+            <Text style={{ backgroundColor: '#d8d9e0', padding: 15, borderColor: '#8b8d98', borderRadius: 5, borderWidth: 1 }}>
+              Selecione arquivo...
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
 
-      <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 40. ,marginBottom: 30 }}>
-        <BotaoPrincipal title="Continuar" onPress={() => navigation.navigate('login')} />
+      <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 40, marginBottom: 30 }}>
+        <BotaoPrincipal title="Continuar" onPress={handleSubmit} />
       </View>
-
-      <StatusBar style="auto" />
     </ScrollView>
   );
 }
@@ -171,13 +223,11 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderColor: '#cdced7',
     borderWidth: 1,
-    width: '100%',
     height: 50,
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    minWidth: 343,
-    maxWidth: 343,
+    width: 336,
   },
   input2: {
     borderRadius: 5,
@@ -185,13 +235,12 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderColor: '#cdced7',
     borderWidth: 1,
-    width: 228,
     height: 50,
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    minWidth: 228,
-    maxWidth: 228,
+    minWidth: 236,
+    maxWidth: 236,
   },
   input3: {
     borderRadius: 5,
@@ -199,12 +248,11 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderColor: '#cdced7',
     borderWidth: 1,
-    width: 100,
     height: 50,
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    minWidth: 100,
-    maxWidth: 100,
+    minWidth: 105,
+    maxWidth: 105,
   },
 });
