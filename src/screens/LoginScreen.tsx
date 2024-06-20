@@ -4,6 +4,7 @@ import { ScrollView,View, Text, Button, Image, StyleSheet, TextInput, TouchableO
 import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { BotaoEntrar, BotaoPrincipal } from '../components/Botao';
+import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
 
 
 export function LoginScreen() {
@@ -12,6 +13,10 @@ const [matricula, setMatricula] = useState('');
 const [senha, setSenha] = useState('');
 const [loading, setLoading] = useState(false); // Estado para controlar o estado de carregamento do botão
 const [error, setError] = useState(null); // Estado para armazenar mensagens de erro
+
+
+
+
 
 const handleLogin = async () => {
     // Verificar se os campos estão vazios
@@ -46,6 +51,19 @@ const handleLogin = async () => {
   };
 
 const navigation = useNavigation();
+
+const[fontsLoad]=useFonts({
+    Poppins_400Regular, 
+    Poppins_500Medium, 
+    Poppins_600SemiBold, 
+    Poppins_700Bold, 
+    Poppins_800ExtraBold 
+   });
+ 
+   if(!fontsLoad){
+    return null;
+   }
+
 
   return (
     <ScrollView style={{flex:1, backgroundColor: '#FFFFFF'}}>
@@ -114,7 +132,7 @@ const navigation = useNavigation();
 
         </View>
         <View style={{alignItems: "center",justifyContent: "center",padding: 10, marginTop: 20}}>
-            <Text style={{fontSize: 14,lineHeight: 14,fontFamily: "Poppins-Regular",color: "#7c36cf"}}>ou</Text>
+            <Text style={{fontSize: 14,lineHeight: 14,fontFamily: "Poppins_400Regular",color: "#7c36cf"}}>ou</Text>
         </View>
 
         <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-evenly',marginTop:20, marginBottom:40}}>
@@ -159,24 +177,21 @@ const navigation = useNavigation();
 const styles = StyleSheet.create({
     textTitulo:{
         color: "#fdfcff",
-        fontFamily: "Poppins-Bold",
+        fontFamily: "Poppins_700Bold",
         fontSize: 32,
         lineHeight: 38,
-        fontWeight: "700",
         marginBottom:10
     },
     textSubTitulo:{
         color: "#fdfcff",
         fontSize: 23,
         lineHeight: 28,
-        fontWeight: "500",
-        fontFamily: "Poppins-Medium"
+        fontFamily: "Poppins_500Medium"
     },
     textLogin: {
         fontSize: 23,
         lineHeight: 28,
-        fontWeight: "500",
-        fontFamily: "Poppins-Medium",
+        fontFamily: "Poppins_500Medium",
         color: "#7c36cf",
         textAlign: "left"
         },
@@ -198,7 +213,7 @@ const styles = StyleSheet.create({
     textLabel:{
         fontSize: 16,
         lineHeight: 19,
-        fontFamily: "Poppins-Regular",
+        fontFamily: "Poppins_400Regular",
         color: "#1e1f24",
         textAlign: "left",
         marginBottom: 10
@@ -206,14 +221,14 @@ const styles = StyleSheet.create({
     textEsqueceuSenha:{
         fontSize: 12,
         lineHeight: 14,
-        fontFamily: "Poppins-Regular",
+        fontFamily: "Poppins_400Regular",
         color: "#1e1f24",
         textAlign: "left"
     },
     textCadastro:{
         fontSize: 12,
         lineHeight: 14,
-        fontFamily: "Poppins-Bold",
+        fontFamily: "Poppins_700Bold",
         color: "#7C36CF",
         textAlign: "left"
     }

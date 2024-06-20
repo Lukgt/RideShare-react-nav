@@ -5,6 +5,8 @@ import { StatusBar } from 'expo-status-bar';
 import { BotaoPrincipal } from '../components/Botao';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker'; // Importar ImagePicker do Expo
+import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
+
 
 export function CadastroM2Screen() {
   const [logradouro, setLogradouro] = useState('');
@@ -19,6 +21,21 @@ export function CadastroM2Screen() {
   const [modelo, setModelo] = useState('');
   const [imagemCNH, setImagemCNH] = useState<string | null>(null); // Estado para armazenar a URI da imagem da CNH
   const [imagemIPVA, setImagemIPVA] = useState<string | null>(null); // Estado para armazenar a URI da imagem do IPVA
+
+
+
+  const[fontsLoad]=useFonts({
+    Poppins_400Regular, 
+    Poppins_500Medium, 
+    Poppins_600SemiBold, 
+    Poppins_700Bold, 
+    Poppins_800ExtraBold 
+   });
+ 
+   if(!fontsLoad){
+    return null;
+   }
+
 
   const navigation = useNavigation();
 
@@ -131,8 +148,7 @@ const styles = StyleSheet.create({
   textCadastro: {
     fontSize: 27,
     lineHeight: 32,
-    fontWeight: '700',
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: ' Poppins_600SemiBold',
     color: '#fdfcff',
     textAlign: 'center',
     display: 'flex',

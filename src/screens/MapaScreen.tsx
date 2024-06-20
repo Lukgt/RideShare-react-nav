@@ -1,9 +1,24 @@
 import React from 'react';
 import { StyleSheet,View, Text, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
 
 
 export function MapaScreen() {
+
+
+  const[fontsLoad]=useFonts({
+    Poppins_400Regular, 
+    Poppins_500Medium, 
+    Poppins_600SemiBold, 
+    Poppins_700Bold, 
+    Poppins_800ExtraBold 
+   });
+ 
+   if(!fontsLoad){
+    return null;
+   }
+   
   return (
     <View style={{flex:1, backgroundColor: 'white'}}>
         <View style={{backgroundColor:'#6000AC', height:134, alignItems:'center',justifyContent:'flex-end'}}>

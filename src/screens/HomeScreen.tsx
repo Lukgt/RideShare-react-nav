@@ -7,6 +7,7 @@ import { BotaoPrincipal } from '../components/Botao';
 
 import CardCarona from '../components/CardCarona';
 import CardMotorista from '../components/CardMotorista';
+import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
 
 import { Modalize } from 'react-native-modalize';
 import ModalCarona from '../components/ModalCarona';
@@ -16,6 +17,20 @@ export function HomeScreen() {
   const [formType, setFormType] = useState('carona'); // Estado inicial: 'carona' selecionado
   const navigation = useNavigation();
   const [numAssentos, setNumAssentos] = useState(0); // Estado inicial do número de assentos
+
+ 
+  const[fontsLoad]=useFonts({
+    Poppins_400Regular, 
+    Poppins_500Medium, 
+    Poppins_600SemiBold, 
+    Poppins_700Bold, 
+    Poppins_800ExtraBold 
+   });
+ 
+   if(!fontsLoad){
+    return null;
+   }
+
 
   const incrementarAssentos = () => {
     if (numAssentos < 4) {
@@ -201,8 +216,7 @@ const styles = StyleSheet.create({
   textOla: {
     fontSize: 18,
     lineHeight: 19,
-    fontWeight: "600",
-    fontFamily: "Poppins-Medium",
+    fontFamily: "Poppins_500Medium",
     color: "#7c36cf",
     textAlign: "left",
     width: 136,
@@ -211,8 +225,7 @@ const styles = StyleSheet.create({
   textHome: {
     fontSize: 18,
     lineHeight: 19,
-    fontWeight: "600",
-    fontFamily: "Poppins-Medium",
+    fontFamily: "Poppins_500Medium",
     color: "#3e176b",
     textAlign: "left",
   },
