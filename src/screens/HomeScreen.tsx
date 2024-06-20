@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { BotaoCarona, BotaoMotorista } from '../components/BotaoHome';
 import { BotaoPrincipal } from '../components/Botao';
 import CardCarona from '../components/CardCarona';
+import CardMotorista from '../components/CardMotorista';
 
 export function HomeScreen() {
   const [formType, setFormType] = useState('carona'); // Estado inicial: 'carona' selecionado
@@ -131,6 +132,11 @@ export function HomeScreen() {
         />
       </View>
       
+      <View style={{alignItems:'center', justifyContent: 'center', marginBottom: 20, marginTop:10}}>
+
+      <CardMotorista foto={''} nome={''} destino={''} setor={''} tempoEncontro={''}/>
+
+      </View>
 
       <StatusBar style='auto' />
     </ScrollView>
