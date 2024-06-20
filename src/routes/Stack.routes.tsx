@@ -11,6 +11,8 @@ import { CadastroM2Screen } from '../screens/CadastroM2Screen';
 import { BottomTabsRotues } from './Bottom-tab.routes';
 import { ModalCScreen } from '../screens/ModalCSreen';
 import { ModalMScreen } from '../screens/ModalMSreen';
+import ProcurarScreen from '../screens/ProcurarScreen';
+import OferecerScreen from '../screens/OferecerScreen';
 
 const { Screen, Navigator} = createStackNavigator();
 
@@ -21,13 +23,6 @@ export function StackRoutes(){
             <Screen
                 name='start'
                 component={StartScreen}
-                options={{
-                    headerShown: false
-                }}
-            />
-            <Screen
-                name='login'
-                component={LoginScreen}
                 options={{
                     headerShown: false
                 }}
@@ -68,6 +63,14 @@ export function StackRoutes(){
                 }}
             />
             <Screen
+                name='login'
+                component={LoginScreen}
+                options={{
+                    headerShown: false
+                }}
+            />
+            
+            <Screen
                 name='home'
                 component={BottomTabsRotues}
                 options={{
@@ -84,6 +87,20 @@ export function StackRoutes(){
             <Screen
                 name='modalM'
                 component={ModalMScreen}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Screen
+                name='procurar'
+                component={ProcurarScreen}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Screen
+                name='oferecer'
+                component={OferecerScreen}
                 options={{
                     headerShown: false
                 }}

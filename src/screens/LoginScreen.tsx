@@ -14,9 +14,7 @@ const [senha, setSenha] = useState('');
 const [loading, setLoading] = useState(false); // Estado para controlar o estado de carregamento do botão
 const [error, setError] = useState(null); // Estado para armazenar mensagens de erro
 
-
-
-
+const navigation = useNavigation();
 
 const handleLogin = async () => {
     // Verificar se os campos estão vazios
@@ -50,7 +48,6 @@ const handleLogin = async () => {
     }
   };
 
-const navigation = useNavigation();
 
 const[fontsLoad]=useFonts({
     Poppins_400Regular, 
@@ -126,9 +123,6 @@ const[fontsLoad]=useFonts({
                 </TouchableOpacity> 
             </View>
             
-            
-            
-
 
         </View>
         <View style={{alignItems: "center",justifyContent: "center",padding: 10, marginTop: 20}}>

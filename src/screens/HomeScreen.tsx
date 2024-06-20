@@ -9,10 +9,6 @@ import CardCarona from '../components/CardCarona';
 import CardMotorista from '../components/CardMotorista';
 import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
 
-import { Modalize } from 'react-native-modalize';
-import ModalCarona from '../components/ModalCarona';
-import ModalMotorista from '../components/ModalMotorista';
-
 export function HomeScreen() {
   const [formType, setFormType] = useState('carona'); // Estado inicial: 'carona' selecionado
   const navigation = useNavigation();
@@ -44,13 +40,6 @@ export function HomeScreen() {
     }
   };
 
-// Modal dos Cards
-  const modalizeRef = useRef<Modalize>(null);
-
-  const onOpen = () => {
-    modalizeRef.current?.open();
-  };
-
 // Troca de tela dos botoes
   const renderForm = () => {
     if (formType === 'carona') {
@@ -78,6 +67,7 @@ export function HomeScreen() {
           </View>
           <BotaoPrincipal
             title='Procurar'
+            onPress={() => navigation.navigate('procurar')}
           />
         </View>
       );
@@ -115,6 +105,7 @@ export function HomeScreen() {
           </View>
           <BotaoPrincipal
             title='Procurar'
+            onPress={() => navigation.navigate('oferecer')}
           />
         </View>
       );
@@ -219,7 +210,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_500Medium",
     color: "#7c36cf",
     textAlign: "left",
-    width: 136,
+    width: 160,
     marginLeft: 20,
   },
   textHome: {

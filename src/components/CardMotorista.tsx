@@ -104,15 +104,20 @@ const styles = StyleSheet.create({
     width: 360,
   },
   foto: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 90,
+    height: 90,
+    borderRadius: 90,
+    borderWidth:1,
+    borderColor:'#6000AC',
     marginRight: 10,
+    marginLeft:10,
+    alignSelf:'center'
   },
   info: {
     flex: 1,
-    marginLeft: 10,
+    marginLeft: 40,
     justifyContent: 'center',
+    marginBottom: 20
   },
   nome: {
     fontSize: 16,
