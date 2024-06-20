@@ -16,17 +16,6 @@ const [error, setError] = useState(null); // Estado para armazenar mensagens de 
 
 
 
-const[fontsLoad]=useFonts({
-    Poppins_400Regular, 
-    Poppins_500Medium, 
-    Poppins_600SemiBold, 
-    Poppins_700Bold, 
-    Poppins_800ExtraBold 
-   });
- 
-   if(!fontsLoad){
-    return null;
-   }
 
 
 const handleLogin = async () => {
@@ -62,6 +51,19 @@ const handleLogin = async () => {
   };
 
 const navigation = useNavigation();
+
+const[fontsLoad]=useFonts({
+    Poppins_400Regular, 
+    Poppins_500Medium, 
+    Poppins_600SemiBold, 
+    Poppins_700Bold, 
+    Poppins_800ExtraBold 
+   });
+ 
+   if(!fontsLoad){
+    return null;
+   }
+
 
   return (
     <ScrollView style={{flex:1, backgroundColor: '#FFFFFF'}}>
