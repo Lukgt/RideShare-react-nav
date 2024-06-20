@@ -85,7 +85,6 @@ const styles = StyleSheet.create({
   texto: {
     fontSize: 16,
     lineHeight: 19,
-    fontFamily: "Poppins-Regular",
     color: "#3e176b",
     textAlign: "left",
     marginBottom: 10
@@ -102,7 +101,6 @@ const styles = StyleSheet.create({
   textoSolicitacao:{
     fontSize: 16,
     lineHeight: 19,
-    fontFamily: "Poppins-Regular",
     color: "#6000ac",
     textAlign: "center"
   }

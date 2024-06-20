@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, TextInput } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BotaoPrincipal } from '../components/Botao';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker'; // Importe Picker corretamente
-import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
+import { Picker } from '@react-native-picker/picker';
+import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function CadastroMScreen() {
   const [nome, setNome] = useState('');
@@ -14,21 +15,40 @@ export function CadastroMScreen() {
   const [empresa, setEmpresa] = useState('');
   const [setor, setSetor] = useState('');
 
-
- 
-  const[fontsLoad]=useFonts({
+  const [fontsLoad] = useFonts({
     Poppins_400Regular, 
     Poppins_500Medium, 
     Poppins_600SemiBold, 
     Poppins_700Bold, 
     Poppins_800ExtraBold 
-   });
- 
-   if(!fontsLoad){
-    return null;
-   }
+  });
 
   const navigation = useNavigation();
+
+  if (!fontsLoad) {
+    return null;
+  }
+
+  const handleContinue = async () => {
+    console.log("Iniciando o processo de continuação");
+    const cadastroParte1 = {
+      nome,
+      email,
+      confirmEmail,
+      empresa,
+      matricula,
+      setor
+    };
+    console.log("Dados do cadastroParte1:", cadastroParte1);
+    try {
+      await AsyncStorage.setItem('cadastroParte1', JSON.stringify(cadastroParte1));
+      console.log("Dados armazenados com sucesso");
+      navigation.navigate('cadastroM2');
+    } catch (error) {
+      console.error("Erro ao armazenar os dados:", error);
+      Alert.alert('Erro', 'Não foi possível salvar os dados. Tente novamente.');
+    }
+  };
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
@@ -54,7 +74,6 @@ export function CadastroMScreen() {
           <TextInput style={styles.input} placeholder="E-mail institucional" keyboardType="email-address" value={email} onChangeText={setEmail} />
           <TextInput style={styles.input} placeholder="Confirme seu e-mail" keyboardType="email-address" value={confirmEmail} onChangeText={setConfirmEmail} />
 
-          {/* Picker para Empresa */}
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={empresa}
@@ -68,9 +87,7 @@ export function CadastroMScreen() {
           </View>
 
           <TextInput style={styles.input} placeholder="Matrícula" value={matricula} onChangeText={setMatricula} />
-          
 
-          {/* Picker para Setor */}
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={setor}
@@ -86,9 +103,8 @@ export function CadastroMScreen() {
       </View>
 
       <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 40 }}>
-        <BotaoPrincipal title="Continuar" onPress={() => navigation.navigate('cadastroM2')} />
+        <BotaoPrincipal title="Continuar" onPress={handleContinue} />
       </View>
-
     </ScrollView>
   );
 }
@@ -97,7 +113,7 @@ const styles = StyleSheet.create({
   textCadastro: {
     fontSize: 27,
     lineHeight: 32,
-    fontFamily: ' Poppins_600SemiBold',
+    fontFamily: 'Poppins_600SemiBold',
     color: '#fdfcff',
     textAlign: 'center',
     display: 'flex',
