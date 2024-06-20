@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, View, Text, Pressable, GestureResponderEvent } from "react-native";
 
+
 interface BotaoProps {
     title: string;
     onPress?: (event: GestureResponderEvent) => void;
@@ -8,6 +9,8 @@ interface BotaoProps {
 }
 
 export function BotaoPrincipal({ title, onPress, disabled}: BotaoProps) {
+
+
 
     return(
     <>
@@ -38,7 +41,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
     fontWeight: "500",
-    fontFamily: "Poppins-Medium",
     color: "#fdfcff",
     textAlign: "center"
     },
@@ -60,7 +62,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         lineHeight: 19,
         fontWeight: "500",
-        fontFamily: "Poppins-Medium",
         color: "#7c36cf",
         textAlign: "center"
         },

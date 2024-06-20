@@ -4,6 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import { BotaoPrincipal } from '../components/Botao';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker'; // Importe Picker corretamente
+import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
+
 
 export function CadastroCScreen() {
   const [nome, setNome] = useState('');
@@ -13,7 +15,22 @@ export function CadastroCScreen() {
   const [empresa, setEmpresa] = useState('');
   const [setor, setSetor] = useState('');
 
+
+  const[fontsLoad]=useFonts({
+    Poppins_400Regular, 
+    Poppins_500Medium, 
+    Poppins_600SemiBold, 
+    Poppins_700Bold, 
+    Poppins_800ExtraBold 
+   });
+ 
+   if(!fontsLoad){
+    return null;
+   }
+
   const navigation = useNavigation();
+
+ 
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
@@ -82,8 +99,7 @@ const styles = StyleSheet.create({
   textCadastro: {
     fontSize: 27,
     lineHeight: 32,
-    fontWeight: '700',
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: 'Poppins_600SemiBold',
     color: '#fdfcff',
     textAlign: 'center',
     display: 'flex',
@@ -142,7 +158,7 @@ const styles = StyleSheet.create({
     width: '100%',
     color: '#62636C',
     fontSize: 16,
-    fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins_400Regular',
   },
 });
 

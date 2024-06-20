@@ -4,7 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { BotaoPrincipal } from '../components/Botao';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
 import * as ImagePicker from 'expo-image-picker'; // Importar ImagePicker do Expo
+
 
 export function CadastroC2Screen() {
   const [logradouro, setLogradouro] = useState('');
@@ -15,6 +17,19 @@ export function CadastroC2Screen() {
   const [senha, setSenha] = useState('');
   const [confirmSenha, setConfirmSenha] = useState('');
   const [imagemDocumento, setImagemDocumento] = useState<string | null>(null); // Estado para armazenar a URI da imagem
+
+
+   const[fontsLoad]=useFonts({
+    Poppins_400Regular, 
+    Poppins_500Medium, 
+    Poppins_600SemiBold, 
+    Poppins_700Bold, 
+    Poppins_800ExtraBold 
+   });
+ 
+   if(!fontsLoad){
+    return null;
+   }
 
   const navigation = useNavigation();
 
@@ -107,8 +122,7 @@ const styles = StyleSheet.create({
   textCadastro: {
     fontSize: 27,
     lineHeight: 32,
-    fontWeight: '700',
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: 'Poppins_600SemiBold',
     color: '#fdfcff',
     textAlign: 'center',
     display: 'flex',

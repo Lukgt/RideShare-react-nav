@@ -5,10 +5,25 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
+import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
 
 
 
 export function PreCadastroScreen() {
+
+
+    
+   const[fontsLoad]=useFonts({
+    Poppins_400Regular, 
+    Poppins_500Medium, 
+    Poppins_600SemiBold, 
+    Poppins_700Bold, 
+    Poppins_800ExtraBold 
+   });
+ 
+   if(!fontsLoad){
+    return null;
+   }
 
 const navigation = useNavigation();
 
@@ -85,24 +100,21 @@ const navigation = useNavigation();
 const styles = StyleSheet.create({
     textTitulo:{
         color: "#fdfcff",
-        fontFamily: "Poppins-Bold",
+        fontFamily: "Poppins_700Bold",
         fontSize: 32,
         lineHeight: 38,
-        fontWeight: "700",
         marginBottom:10
     },
     textSubTitulo:{
         color: "#fdfcff",
         fontSize: 23,
         lineHeight: 28,
-        fontWeight: "500",
-        fontFamily: "Poppins-Medium"
+        fontFamily: "Poppins_500Medium"
     },
     textTituloPreCadastro: {
         fontSize: 23,
         lineHeight: 28,
-        fontWeight: "500",
-        fontFamily: "Poppins-Medium",
+        fontFamily: "Poppins_500Medium",
         color: "#7c36cf",
         textAlign: "left",
         display: "flex",
@@ -119,15 +131,14 @@ const styles = StyleSheet.create({
     textCadastro:{
         fontSize: 12,
         lineHeight: 14,
-        fontFamily: "Poppins-Bold",
+        fontFamily: "Poppins_700Bold",
         color: "#7C36CF",
         textAlign: "left"
     },
     textCard:{
         fontSize: 23,
         lineHeight: 28,
-        fontWeight: "700",
-        fontFamily: "Poppins-Medium",
+        fontFamily: "Poppins_500Medium",
         color: "#7c36cf",
         textAlign: "left",
         marginTop: 10
@@ -135,8 +146,7 @@ const styles = StyleSheet.create({
     textSubCard:{
         fontSize: 12,
         lineHeight: 14,
-        fontFamily: "Poppins-Regular",
-        fontWeight: "500",
+        fontFamily: "Poppins_400Regular",
         color: "#4f008e",
         textAlign: "center",
         display: "flex",

@@ -4,11 +4,27 @@ import { StatusBar } from 'expo-status-bar';
 
 import { useNavigation } from '@react-navigation/native';
 import { BotaoEntrar, BotaoPrincipal } from '../components/Botao';
+import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
 
 
 export function StartScreen() {
 
+
+
   const navigation = useNavigation();
+
+    
+  const[fontsLoad]=useFonts({
+    Poppins_400Regular, 
+    Poppins_500Medium, 
+    Poppins_600SemiBold, 
+    Poppins_700Bold, 
+    Poppins_800ExtraBold 
+   });
+ 
+   if(!fontsLoad){
+    return null;
+   }
 
   return (
     <View style={{flex:1, backgroundColor: '#6000AC'}}>
@@ -51,17 +67,15 @@ export function StartScreen() {
 const styles = StyleSheet.create({
   textTitulo:{
     color: "#fdfcff",
-    fontFamily: "Poppins-Bold",
+    fontFamily: "Poppins_700Bold",
     fontSize: 32,
     lineHeight: 38,
-    fontWeight: "700",
     marginBottom:10
   },
   textSubTitulo:{
     color: "#fdfcff",
     fontSize: 23,
     lineHeight: 28,
-    fontWeight: "500",
-    fontFamily: "Poppins-Medium"
+    fontFamily: "Poppins_500Medium"
   }
 })
