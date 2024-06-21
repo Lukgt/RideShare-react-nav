@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { BotaoPrincipal } from '../components/Botao';
 import { useFonts, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DatePicker from 'react-native-datepicker';
 
 export function LoginScreen() {
   const [matricula, setMatricula] = useState('');
