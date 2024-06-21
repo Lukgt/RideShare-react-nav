@@ -38,7 +38,9 @@ _____________________
 * **Banco de Dados NoSQL MongoDB:** Os dados de motorista e carona foram armazenados no AtlasDB um serviço em nuvem do MongoDB. O contato do banco de dados com o Front-end foi realizado pelo Nodejs através de rotas  
 
 
-* **Backend Node.js:** O backend contruido com rotas para perfil, agendamento motorista, agendamento carona,  usuário carona e usuário motorista. As rotas foram feitas para adicionar informações, editar informações, fazer consultas em lista ou indivídual e deletar  Todas as rotas foram testadas no Postman e em seguida adicionadas no Github: https://github.com/carloscamposb/Backend_RideShare para ser utilizado na nuvem pelo render
+* **Backend Node.js:** O backend contruido com rotas para perfil, agendamento motorista, agendamento carona,  usuário carona e usuário motorista. As rotas foram feitas para adicionar informações, editar informações, fazer consultas em lista ou indivídual e deletar  Todas as rotas foram testadas no Postman e em seguida adicionadas no Github: https://github.com/carloscamposb/Backend_RideShare para ser utilizado no render (serviço em nuvem)
+
+  > Dessa forma nossa aplicação está moderna e alinhada com o mercado com todos os serviços desacoplados em diferentes repositórios e conectados via código
 
 
 ### Projeto entregue em: 21/06/24 📆 
