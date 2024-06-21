@@ -1,56 +1,66 @@
-import React, { useState, useEffect } from 'react';
-import { ScrollView, View, Text, Image, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ScrollView, View, Text, Image, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+
 import { BotaoCarona, BotaoMotorista } from '../components/BotaoHome';
 import { BotaoPrincipal } from '../components/Botao';
-
 import CardCarona from '../components/CardCarona';
 import CardMotorista from '../components/CardMotorista';
-import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
-import { DatePicker } from '../components/DatePicker';
-
+import { useFonts, Poppins_400Regular, Poppins_500Medium } from '@expo-google-fonts/poppins';
 
 export function HomeScreen() {
+  const [formType, setFormType] = useState('carona');
+  const [numAssentos, setNumAssentos] = useState(0);
+  const [userName, setUserName] = useState('');
+  const [userCompany, setUserCompany] = useState('');
+  const [partida, setPartida] = useState('');
+  const [destino, setDestino] = useState('');
+  const [data, setData] = useState('');
+  const [hora, setHora] = useState('');
+  const [vagas, setVagas] = useState(0);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-
-  const [formType, setFormType] = useState('carona'); // Estado inicial: 'carona' selecionado
-  const [numAssentos, setNumAssentos] = useState(0); // Estado inicial do número de assentos
-  const [userName, setUserName] = useState(''); // Estado para armazenar o nome do usuário
-  const [userCompany, setUserCompany] = useState(''); // Estado para armazenar a empresa do usuário
   const navigation = useNavigation();
 
-  // Carregar fontes
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
-    Poppins_600SemiBold,
-    Poppins_700Bold,
-    Poppins_800ExtraBold
   });
 
-  // Efeito para carregar nome e empresa do AsyncStorage ao carregar a tela
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userNameStored = await AsyncStorage.getItem('nome');
-        const userCompanyStored = await AsyncStorage.getItem('empresa');
+  const fetchUserData = async () => {
+    try {
+      const userNameStored = await AsyncStorage.getItem('nome');
+      const userCompanyStored = await AsyncStorage.getItem('empresa');
+      const storedProfileImage = await AsyncStorage.getItem('@profile_image_uri');
 
-        if (userNameStored !== null && userCompanyStored !== null) {
-          setUserName(userNameStored);
-          setUserCompany(userCompanyStored);
-        }
-      } catch (error) {
-        console.error('Erro ao buscar dados do usuário:', error);
+      if (userNameStored !== null) {
+        setUserName(userNameStored);
       }
-    };
+      if (userCompanyStored !== null) {
+        setUserCompany(userCompanyStored);
+      }
+      if (storedProfileImage !== null) {
+        setProfileImage(storedProfileImage);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error('Erro ao buscar dados do usuário:', error);
+      setLoading(false);
+    }
+  };
 
-    fetchUserData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserData();
+    }, [])
+  );
 
-  if (!fontsLoaded) {
-    return null; // Aguarda o carregamento das fontes
+  if (!fontsLoaded || loading) {
+    return null;
   }
 
   const incrementarAssentos = () => {
@@ -65,7 +75,62 @@ export function HomeScreen() {
     }
   };
 
-  // Troca de tela dos botões
+  const handleProcurar = async () => {
+    if (!partida || (formType === 'carona' && !destino) || !data || !hora || !userCompany) {
+      Alert.alert('Preencha todos os campos!');
+      return;
+    }
+
+    let agendamentoData = {
+      partida,
+      empresa: userCompany,
+      data,
+      hora,
+    };
+
+    if (formType === 'carona') {
+      agendamentoData.destino = destino;
+    } else if (formType === 'motorista') {
+      agendamentoData.vagas = vagas;
+    }
+
+    console.log('Dados de agendamento antes da requisição:', agendamentoData);
+
+    try {
+      let response;
+      if (formType === 'carona') {
+        response = await axios.post('https://backend-rideshare.onrender.com/agendamento/register', agendamentoData);
+        console.log('Resposta do servidor (carona):', response.data);
+        if (response.status === 201) {
+          Alert.alert('Agendamento de carona criado com sucesso!');
+          setPartida('');
+          setDestino('');
+          setData('');
+          setHora('');
+          navigation.navigate('modalC'); // Navega para modalC após sucesso
+        } else {
+          Alert.alert('Erro ao criar agendamento de carona. Tente novamente mais tarde.');
+        }
+      } else if (formType === 'motorista') {
+        response = await axios.post('https://backend-rideshare.onrender.com/agendamentoMotorista/register', agendamentoData);
+        console.log('Resposta do servidor (motorista):', response.data);
+        if (response.status === 201) {
+          Alert.alert('Agendamento de motorista criado com sucesso!');
+          setPartida('');
+          setData('');
+          setHora('');
+          setVagas(0);
+          navigation.navigate('modalM'); // Navega para modalM após sucesso
+        } else {
+          Alert.alert('Erro ao criar agendamento de motorista. Tente novamente mais tarde.');
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao criar agendamento:', error);
+      Alert.alert('Erro no servidor. Tente novamente mais tarde.');
+    }
+  };
+
   const renderForm = () => {
     if (formType === 'carona') {
       return (
@@ -73,30 +138,34 @@ export function HomeScreen() {
           <TextInput
             style={styles.input}
             placeholder='De:'
+            value={partida}
+            onChangeText={setPartida}
             textContentType='location'
           />
           <TextInput
             style={styles.input}
             placeholder='Para:'
-            value={userCompany} // Define o valor inicial como o nome da empresa
-            editable={false} // Impede a edição pelo usuário
-            textContentType='none' // Remove sugestões de preenchimento automático
+            value={destino}
+            onChangeText={setDestino}
+            textContentType='none'
           />
           <View style={styles.row}>
-
-            <DatePicker/>
-            {/* <TextInput
+            <TextInput
               style={styles.input2}
               placeholder='Data:'
+              value={data}
+              onChangeText={setData}
             />
             <TextInput
               style={styles.input2}
               placeholder='Hora:'
-            /> */}
+              value={hora}
+              onChangeText={setHora}
+            />
           </View>
           <BotaoPrincipal
             title='Procurar'
-            onPress={() => navigation.navigate('procurar')}
+            onPress={handleProcurar}
           />
         </View>
       );
@@ -106,24 +175,26 @@ export function HomeScreen() {
           <TextInput
             style={styles.input}
             placeholder='Para:'
-            value={userCompany} // Define o valor inicial como o nome da empresa
-            editable={false} // Impede a edição pelo usuário
-            textContentType='none' // Remove sugestões de preenchimento automático
+            value={userCompany}
+            onChangeText={setUserCompany}
+            textContentType='none'
           />
           <View style={styles.row}>
-
-            <DatePicker/>
-            {/* <TextInput
+            <TextInput
               style={styles.input2}
               placeholder='Data de partida:'
+              value={data}
+              onChangeText={setData}
             />
             <TextInput
               style={styles.input2}
               placeholder='Hora de partida:'
-            /> */}
+              value={hora}
+              onChangeText={setHora}
+            />
           </View>
           <View style={styles.counterContainer}>
-            <Text style={styles.counterText}>Assentos disponíveis</Text>
+            <Text style={styles.counterText}>Assentos livres</Text>
 
             <TouchableOpacity onPress={decrementarAssentos} style={styles.counterButton}>
               <Text style={styles.buttonText}>-</Text>
@@ -138,23 +209,32 @@ export function HomeScreen() {
           </View>
           <BotaoPrincipal
             title='Procurar'
-            onPress={() => navigation.navigate('oferecer')}
+            onPress={handleProcurar}
           />
         </View>
       );
     }
   };
 
-  // Corpo principal
   return (
     <ScrollView style={{ flex: 1, backgroundColor: 'white' }}>
       <View style={styles.header}>
         <Image
           source={require('../../assets/vamos.png')}
         />
-        <Image
-          source={require('../../assets/account.png')}
-        />
+        <TouchableOpacity onPress={() => navigation.navigate('Perfil')}>
+          {profileImage ? (
+            <Image
+              style={styles.profileImage}
+              source={{ uri: profileImage }}
+            />
+          ) : (
+            <Image
+              style={styles.profileImage}
+              source={require('../../assets/account.png')}
+            />
+          )}
+        </TouchableOpacity>
       </View>
       <View style={styles.greetingContainer}>
         <Text style={styles.textOla}>Olá, {userName}!</Text>
@@ -164,17 +244,15 @@ export function HomeScreen() {
         <BotaoCarona
           title='Carona'
           onPress={() => setFormType('carona')}
-          isSelected={formType === 'carona'} // Verifica se 'carona' está selecionado
+          isSelected={formType === 'carona'}
         />
         <BotaoMotorista
           title='Motorista'
           onPress={() => setFormType('motorista')}
-          isSelected={formType === 'motorista'} // Verifica se 'motorista' está selecionado
+          isSelected={formType === 'motorista'}
         />
       </View>
-
       {renderForm()}
-
       <View style={styles.suggestionsContainer}>
         <Text style={styles.textHome}>
           Sugestões de caronas
@@ -206,107 +284,86 @@ export function HomeScreen() {
 const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'space-around',
-    marginBottom: 40,
+    padding: 20,
     backgroundColor: '#6000AC',
-    height: 134,
-    paddingTop: 30,
+  },
+  profileImage: {
+    borderRadius: 50,
+    height: 80,
+    width: 80,
+    marginBottom: 10,
   },
   greetingContainer: {
-    marginBottom: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 20,
+  },
+  textOla: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#3C3A36',
+    fontFamily: 'Poppins_500Medium',
   },
   buttonsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    marginBottom: 30,
-    marginTop: 20,
+    justifyContent: 'center',
+    marginVertical: 20,
   },
   formContainer: {
-    backgroundColor: '#F5EEFF',
-    height: 340,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 16,
-    gap: 20,
+    marginHorizontal: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
     borderRadius: 5,
+    marginBottom: 10,
+  },
+  input2: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 5,
   },
   row: {
     flexDirection: 'row',
-    gap: 10,
-    justifyContent: 'space-around',
-    marginHorizontal: 16,
-  },
-  textOla: {
-    fontSize: 18,
-    lineHeight: 19,
-    fontFamily: 'Poppins_500Medium',
-    color: '#7c36cf',
-    textAlign: 'left',
-    width: 160,
-    marginLeft: 20,
-  },
-  textHome: {
-    fontSize: 18,
-    lineHeight: 19,
-    fontFamily: 'Poppins_500Medium',
-    color: '#3e176b',
-    textAlign: 'left',
-  },
-  input: {
-    borderRadius: 5,
-    backgroundColor: '#fcfcfd',
-    borderStyle: 'solid',
-    borderColor: '#cdced7',
-    borderWidth: 1,
-    width: '85%',
-    height: 50,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    marginHorizontal: 32,
-  },
-  input2: {
-    borderRadius: 5,
-    backgroundColor: '#fcfcfd',
-    borderStyle: 'solid',
-    borderColor: '#cdced7',
-    borderWidth: 1,
-    width: '45%',
-    height: 50,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-  },
-  suggestionsContainer: {
-    alignItems: 'flex-start',
-    marginTop: 30,
-    marginLeft: 25,
+    justifyContent: 'space-between',
   },
   counterContainer: {
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'flex-end',
-    marginRight: 30,
-    marginTop: 10,
+    marginVertical: 20,
+  },
+  counterText: {
+    fontSize: 18,
+    marginHorizontal: 10,
   },
   counterButton: {
-    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#cdced7',
+    borderColor: '#ddd',
     padding: 10,
     borderRadius: 5,
   },
   buttonText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'black',
+    fontSize: 18,
+    fontWeight: '600',
   },
-  counterText: {
+  suggestionsContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  textHome: {
     fontSize: 20,
-    marginHorizontal: 25,
+    fontWeight: '700',
+    color: '#3C3A36',
   },
 });
 
 export default HomeScreen;
+
 
