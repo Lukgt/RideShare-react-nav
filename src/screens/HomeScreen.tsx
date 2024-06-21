@@ -1,32 +1,53 @@
-import React, { useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, View, Text, Image, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BotaoCarona, BotaoMotorista } from '../components/BotaoHome';
 import { BotaoPrincipal } from '../components/Botao';
 
 import CardCarona from '../components/CardCarona';
 import CardMotorista from '../components/CardMotorista';
-import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
+import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins';
 
 export function HomeScreen() {
   const [formType, setFormType] = useState('carona'); // Estado inicial: 'carona' selecionado
-  const navigation = useNavigation();
   const [numAssentos, setNumAssentos] = useState(0); // Estado inicial do número de assentos
+  const [userName, setUserName] = useState(''); // Estado para armazenar o nome do usuário
+  const [userCompany, setUserCompany] = useState(''); // Estado para armazenar a empresa do usuário
+  const navigation = useNavigation();
 
- 
-  const[fontsLoad]=useFonts({
-    Poppins_400Regular, 
-    Poppins_500Medium, 
-    Poppins_600SemiBold, 
-    Poppins_700Bold, 
-    Poppins_800ExtraBold 
-   });
- 
-   if(!fontsLoad){
-    return null;
-   }
+  // Carregar fontes
+  const [fontsLoaded] = useFonts({
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+    Poppins_800ExtraBold
+  });
 
+  // Efeito para carregar nome e empresa do AsyncStorage ao carregar a tela
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userNameStored = await AsyncStorage.getItem('nome');
+        const userCompanyStored = await AsyncStorage.getItem('empresa');
+
+        if (userNameStored !== null && userCompanyStored !== null) {
+          setUserName(userNameStored);
+          setUserCompany(userCompanyStored);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar dados do usuário:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  if (!fontsLoaded) {
+    return null; // Aguarda o carregamento das fontes
+  }
 
   const incrementarAssentos = () => {
     if (numAssentos < 4) {
@@ -40,7 +61,7 @@ export function HomeScreen() {
     }
   };
 
-// Troca de tela dos botoes
+  // Troca de tela dos botões
   const renderForm = () => {
     if (formType === 'carona') {
       return (
@@ -53,7 +74,9 @@ export function HomeScreen() {
           <TextInput
             style={styles.input}
             placeholder='Para:'
-            textContentType='location'
+            value={userCompany} // Define o valor inicial como o nome da empresa
+            editable={false} // Impede a edição pelo usuário
+            textContentType='none' // Remove sugestões de preenchimento automático
           />
           <View style={styles.row}>
             <TextInput
@@ -77,7 +100,9 @@ export function HomeScreen() {
           <TextInput
             style={styles.input}
             placeholder='Para:'
-            textContentType='location'
+            value={userCompany} // Define o valor inicial como o nome da empresa
+            editable={false} // Impede a edição pelo usuário
+            textContentType='none' // Remove sugestões de preenchimento automático
           />
           <View style={styles.row}>
             <TextInput
@@ -112,7 +137,7 @@ export function HomeScreen() {
     }
   };
 
-  //corpo principal
+  // Corpo principal
   return (
     <ScrollView style={{ flex: 1, backgroundColor: 'white' }}>
       <View style={styles.header}>
@@ -124,8 +149,8 @@ export function HomeScreen() {
         />
       </View>
       <View style={styles.greetingContainer}>
-        <Text style={styles.textOla}>Olá, user!</Text>
-        <Text style={styles.textOla}>Seja bem-vindo!</Text>
+        <Text style={styles.textOla}>Olá, {userName}!</Text>
+        <Text style={styles.textOla}>da empresa {userCompany}!</Text>
       </View>
       <View style={styles.buttonsContainer}>
         <BotaoCarona
@@ -137,7 +162,6 @@ export function HomeScreen() {
           title='Motorista'
           onPress={() => setFormType('motorista')}
           isSelected={formType === 'motorista'} // Verifica se 'motorista' está selecionado
-
         />
       </View>
       {renderForm()}
@@ -147,21 +171,20 @@ export function HomeScreen() {
         </Text>
       </View>
 
-      <View style={{alignItems:'center', justifyContent: 'center', marginBottom: 20, marginTop:20}}>
+      <View style={{ alignItems: 'center', justifyContent: 'center', marginBottom: 20, marginTop: 20 }}>
 
         <TouchableOpacity onPress={() => navigation.navigate('modalC')}>
-          <CardCarona foto={''} nome={''} destino={''} distancia={''} tempoChegada={''} placa={''} modeloCarro={''} assentosDisponiveis={0}      
+          <CardCarona foto={''} nome={''} destino={''} distancia={''} tempoChegada={''} placa={''} modeloCarro={''} assentosDisponiveis={0}
           />
         </TouchableOpacity>
 
       </View>
-      
-      <View style={{alignItems:'center', justifyContent: 'center', marginBottom: 20, marginTop:10}}>
-      
-      <TouchableOpacity onPress={() => navigation.navigate('modalM')}>
-        <CardMotorista foto={''} nome={''} destino={''} setor={''} tempoEncontro={''}/>
-      </TouchableOpacity>
 
+      <View style={{ alignItems: 'center', justifyContent: 'center', marginBottom: 20, marginTop: 10 }}>
+
+        <TouchableOpacity onPress={() => navigation.navigate('modalM')}>
+          <CardMotorista foto={''} nome={''} destino={''} setor={''} tempoEncontro={''} />
+        </TouchableOpacity>
 
       </View>
 
@@ -207,18 +230,18 @@ const styles = StyleSheet.create({
   textOla: {
     fontSize: 18,
     lineHeight: 19,
-    fontFamily: "Poppins_500Medium",
-    color: "#7c36cf",
-    textAlign: "left",
+    fontFamily: 'Poppins_500Medium',
+    color: '#7c36cf',
+    textAlign: 'left',
     width: 160,
     marginLeft: 20,
   },
   textHome: {
     fontSize: 18,
     lineHeight: 19,
-    fontFamily: "Poppins_500Medium",
-    color: "#3e176b",
-    textAlign: "left",
+    fontFamily: 'Poppins_500Medium',
+    color: '#3e176b',
+    textAlign: 'left',
   },
   input: {
     borderRadius: 5,
@@ -253,8 +276,8 @@ const styles = StyleSheet.create({
   counterContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf:'flex-end',
-    marginRight:30,
+    alignSelf: 'flex-end',
+    marginRight: 30,
     marginTop: 10,
   },
   counterButton: {
@@ -276,3 +299,4 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+

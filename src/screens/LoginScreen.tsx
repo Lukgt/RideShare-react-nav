@@ -1,229 +1,333 @@
 import React, { useState } from 'react';
-import { ScrollView,View, Text, Button, Image, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-
+import { ScrollView, View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import { BotaoEntrar, BotaoPrincipal } from '../components/Botao';
-import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
-
+import { BotaoPrincipal } from '../components/Botao';
+import { useFonts, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function LoginScreen() {
+  const [matricula, setMatricula] = useState('');
+  const [senha, setSenha] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-const [matricula, setMatricula] = useState('');
-const [senha, setSenha] = useState('');
-const [loading, setLoading] = useState(false); // Estado para controlar o estado de carregamento do botão
-const [error, setError] = useState(null); // Estado para armazenar mensagens de erro
+  const navigation = useNavigation();
 
-const navigation = useNavigation();
-
-const handleLogin = async () => {
-    // Verificar se os campos estão vazios
-    if (!matricula.trim() || !senha.trim()) {
-      setError('Por favor, preencha todos os campos.');
-      return;
-    }
-  
-    // Simular um estado de carregamento enquanto a autenticação ocorre
-    setLoading(true);
-  
+  // Função para tentar realizar o login em ambas as APIs
+  const handleLogin = async () => {
     try {
-      // Aqui você faria a chamada real para a API de autenticação
-      // Substitua este trecho com a lógica real de autenticação
-      // Simulando uma chamada de API por 1 segundo
-      await new Promise(resolve => setTimeout(resolve, 1000));
-  
-      // Simulando sucesso ou falha com base em um exemplo simples
-      const loginSuccess = true; // Substitua isso com a lógica real de sucesso/falha
-  
-      if (loginSuccess) {
-        navigation.navigate('home'); // Navegar para a tela home após o login bem-sucedido
-      } else {
-        setError('Matrícula ou senha inválidas.'); // Simular erro de autenticação
+      setLoading(true);
+      setError(null);
+
+      if (!matricula.trim() || !senha.trim()) {
+        setError('Por favor, preencha todos os campos.');
+        return;
       }
+
+      console.log(`Tentando fazer login com matrícula ${matricula} e senha ${senha}`);
+
+      // Tentar primeiro com a rota /user/login
+      const userLoginSuccess = await attemptLogin('https://backend-rideshare.onrender.com/user/login', matricula, senha, false);
+
+      if (userLoginSuccess) {
+        return;
+      }
+
+      // Tentar com a rota /userMotorista/login
+      const motoristaLoginSuccess = await attemptLogin('https://backend-rideshare.onrender.com/userMotorista/login', matricula, senha, true);
+
+      if (motoristaLoginSuccess) {
+        return;
+      }
+
+      // Se nenhum login for bem-sucedido, exibir erro
+      setError('Matrícula ou senha inválidas.');
+      Alert.alert('Erro', 'Não foi possível fazer login. Verifique suas credenciais e tente novamente.');
     } catch (error) {
       console.error('Erro ao realizar login:', error);
       setError('Erro ao tentar fazer login. Por favor, tente novamente mais tarde.');
+      Alert.alert('Erro', 'Não foi possível fazer login. Verifique sua conexão e tente novamente.');
     } finally {
-      setLoading(false); // Finaliza o estado de carregamento após a autenticação
+      setLoading(false);
     }
   };
 
+  // Função auxiliar para realizar o login em uma API específica
+  const attemptLogin = async (url, matricula, senha, isMotorista) => {
+    try {
+      console.log(`Tentando fazer login com URL: ${url}`);
+      console.log('Dados de login:', { matricula, senha });
 
-const[fontsLoad]=useFonts({
-    Poppins_400Regular, 
-    Poppins_500Medium, 
-    Poppins_600SemiBold, 
-    Poppins_700Bold, 
-    Poppins_800ExtraBold 
-   });
- 
-   if(!fontsLoad){
-    return null;
-   }
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          matricula: matricula,
+          senha: senha,
+        }),
+      });
 
+      const data = await response.json();
+      console.log('Resposta da API:', data);
+
+      if (!response.ok) {
+        if (data.msg === 'Usuário não encontrado') {
+          // Retorna falso se o usuário não for encontrado, mas não lança um erro
+          return false;
+        } else {
+          throw new Error(data.msg || 'Erro ao tentar fazer login');
+        }
+      }
+
+      // Salvar token no AsyncStorage
+      await AsyncStorage.setItem('token', data.token);
+
+      // Obter informações adicionais do usuário usando o token
+      const userId = data.userId;
+      const userEndpoint = isMotorista ? 'userMotorista' : 'user';
+
+      // Solicitar nome do usuário
+      const nameResponse = await fetch(`https://backend-rideshare.onrender.com/${userEndpoint}/${userId}/nome`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${data.token}`,
+        },
+      });
+
+      if (!nameResponse.ok) {
+        throw new Error('Erro ao obter o nome do usuário');
+      }
+
+      const nameData = await nameResponse.json();
+
+      // Solicitar nome da empresa
+      const empresaResponse = await fetch(`https://backend-rideshare.onrender.com/${userEndpoint}/${userId}/empresa`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${data.token}`,
+        },
+      });
+
+      if (!empresaResponse.ok) {
+        throw new Error('Erro ao obter o nome da empresa');
+      }
+
+      const empresaData = await empresaResponse.json();
+
+      // Salvar o nome do usuário e da empresa no AsyncStorage
+      await AsyncStorage.setItem('nome', nameData.nome);
+      await AsyncStorage.setItem('empresa', empresaData.empresa);
+
+      // Verificar se os dados foram salvos corretamente no AsyncStorage
+      const nomeSalvo = await AsyncStorage.getItem('nome');
+      const empresaSalva = await AsyncStorage.getItem('empresa');
+      console.log('Nome salvo no AsyncStorage:', nomeSalvo);
+      console.log('Empresa salva no AsyncStorage:', empresaSalva);
+
+      // Navegar para a tela Home após login bem-sucedido
+      navigation.navigate('home', {
+        nomeUsuario: nameData.nome,
+        empresa: empresaData.empresa,
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Erro ao realizar login:', error);
+      return false;
+    }
+  };
+
+  const [fontsLoaded] = useFonts({
+    Poppins_400Regular,
+    Poppins_700Bold,
+  });
+
+  if (!fontsLoaded) {
+    return null; // Aguarda o carregamento das fontes
+  }
 
   return (
-    <ScrollView style={{flex:1, backgroundColor: '#FFFFFF'}}>
+    <ScrollView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+      <View style={styles.container}>
+        <Image source={require('../../assets/carrofundoescuro.png')} />
+        <Image source={require('../../assets/rideshare_login.png')} />
+        <Text style={styles.textLogin}>Login</Text>
+      </View>
 
-        <View style={{alignItems:'center', justifyContent:'center', marginBottom:40}}>
-            <Image
-            source={require('../../assets/carrofundoescuro.png')}
-            />
-            <Image
-            source={require('../../assets/rideshare_login.png')}
-            />
-            
-            <Text style={styles.textLogin}>Login</Text>
-        </View>
-
-        <View style={{ alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-        <View>
-            <Text style={styles.textLabel}>Matrícula</Text>
-            <TextInput
+      <View style={styles.formContainer}>
+        <View style={styles.inputContainer}>
+          <Text style={styles.textLabel}>Matrícula</Text>
+          <TextInput
             style={styles.input}
             placeholder="Digite sua matrícula"
             value={matricula}
             onChangeText={setMatricula}
-            />
+          />
         </View>
-        <View>
-            <Text style={styles.textLabel}>Senha</Text>
-            <TextInput
+        <View style={styles.inputContainer}>
+          <Text style={styles.textLabel}>Senha</Text>
+          <TextInput
             style={styles.input}
             placeholder="Digite sua senha"
             secureTextEntry={true}
             value={senha}
             onChangeText={setSenha}
-            />
+          />
         </View>
 
-        {error && <Text style={{ color: 'red', marginBottom: 10 }}>{error}</Text>}
-        </View>
+        {error && <Text style={styles.errorText}>{error}</Text>}
+      </View>
 
-        <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 40 }}>
+      <View style={styles.buttonContainer}>
         <BotaoPrincipal
-            title={loading ? 'Carregando...' : 'Login'}
-            onPress={handleLogin}
-            disabled={loading}
+          title={loading ? 'Carregando...' : 'Login'}
+          onPress={handleLogin}
+          disabled={loading}
         />
+      </View>
+
+      <View style={styles.bottomContainer}>
+        <TouchableOpacity>
+          <Text style={styles.textEsqueceuSenha}>Esqueceu a senha?</Text>
+        </TouchableOpacity>
+
+        <View style={styles.cadastroContainer}>
+          <Text style={styles.textEsqueceuSenha}>Não tem conta?</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('preCadastro')}>
+            <Text style={styles.textCadastro}>Cadastre-se</Text>
+          </TouchableOpacity>
         </View>
-        <View style={{flexDirection:'row', alignItems:'center',justifyContent:'space-around',marginTop:20}}>
+      </View>
 
-            <TouchableOpacity>
-                <Text style={styles.textEsqueceuSenha}>Esqueceu a senha?</Text>
-            </TouchableOpacity>
+      <View style={styles.dividerContainer}>
+        <Text style={styles.dividerText}>ou</Text>
+      </View>
 
-            <View style={{flexDirection:'row',gap:5}}>
-               <Text style={styles.textEsqueceuSenha}>Não tem conta?</Text>
+      <View style={styles.socialContainer}>
+        <TouchableOpacity style={styles.socialButton}>
+          <Image source={require('../../assets/facebook.png')} />
+        </TouchableOpacity>
 
-                <TouchableOpacity
-                onPress={()=> navigation.navigate('preCadastro')}
-                >
-                    <Text style={styles.textCadastro}>Cadastre-se</Text>
-                </TouchableOpacity> 
-            </View>
-            
+        <TouchableOpacity style={styles.socialButton}>
+          <Image source={require('../../assets/google.png')} />
+        </TouchableOpacity>
 
-        </View>
-        <View style={{alignItems: "center",justifyContent: "center",padding: 10, marginTop: 20}}>
-            <Text style={{fontSize: 14,lineHeight: 14,fontFamily: "Poppins_400Regular",color: "#7c36cf"}}>ou</Text>
-        </View>
+        <TouchableOpacity style={styles.socialButton}>
+          <Image source={require('../../assets/apple.png')} />
+        </TouchableOpacity>
+      </View>
 
-        <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-evenly',marginTop:20, marginBottom:40}}>
-
-            <TouchableOpacity 
-            style={{borderWidth:1, borderColor:'#DAC4FF', borderRadius:10, padding:10}}
-            onPress={() => navigation.navigate('home')}
-            >
-                <Image
-                    source={require('../../assets/facebook.png')}
-                />
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-            style={{borderWidth:1, borderColor:'#DAC4FF', borderRadius:10, padding:10}}
-            onPress={() => navigation.navigate('home')}
-            >
-                <Image
-                        source={require('../../assets/google.png')}
-                    />
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-            style={{borderWidth:1, borderColor:'#DAC4FF', borderRadius:10, padding:10}}
-            onPress={() => navigation.navigate('home')}
-            >
-                <Image
-                        source={require('../../assets/apple.png')}
-                    />
-            </TouchableOpacity>
-
-        </View>
-        
-      
-        
-        <StatusBar style='auto'/>
+      <StatusBar style='auto' />
     </ScrollView>
   );
 }
 
-
 const styles = StyleSheet.create({
-    textTitulo:{
-        color: "#fdfcff",
-        fontFamily: "Poppins_700Bold",
-        fontSize: 32,
-        lineHeight: 38,
-        marginBottom:10
-    },
-    textSubTitulo:{
-        color: "#fdfcff",
-        fontSize: 23,
-        lineHeight: 28,
-        fontFamily: "Poppins_500Medium"
-    },
-    textLogin: {
-        fontSize: 23,
-        lineHeight: 28,
-        fontFamily: "Poppins_500Medium",
-        color: "#7c36cf",
-        textAlign: "left"
-        },
-    
-    input:{
-        borderRadius: 5,
-        backgroundColor: "#fcfcfd",
-        borderStyle: "solid",
-        borderColor: "#cdced7",
-        borderWidth: 1,
-        width: "100%",
-        height: 50,
-        flexDirection: "row",
-        alignItems: "center",
-        padding: 10,
-        minWidth: 343,
-        maxWidth: 343
-    },
-    textLabel:{
-        fontSize: 16,
-        lineHeight: 19,
-        fontFamily: "Poppins_400Regular",
-        color: "#1e1f24",
-        textAlign: "left",
-        marginBottom: 10
-    },
-    textEsqueceuSenha:{
-        fontSize: 12,
-        lineHeight: 14,
-        fontFamily: "Poppins_400Regular",
-        color: "#1e1f24",
-        textAlign: "left"
-    },
-    textCadastro:{
-        fontSize: 12,
-        lineHeight: 14,
-        fontFamily: "Poppins_700Bold",
-        color: "#7C36CF",
-        textAlign: "left"
-    }
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 40,
+  },
+  formContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingHorizontal: 20,
+  },
+  inputContainer: {
+    width: '100%',
+    marginBottom: 10,
+  },
+  buttonContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 40,
+  },
+  bottomContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    marginTop: 20,
+  },
+  cadastroContainer: {
+    flexDirection: 'row',
+    gap: 5,
+  },
+  dividerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+  },
+  socialContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    marginTop: 20,
+    marginBottom: 40,
+  },
+  textLogin: {
+    fontSize: 23,
+    lineHeight: 28,
+    fontFamily: 'Poppins_500Medium',
+    color: '#7c36cf',
+    textAlign: 'left',
+  },
+  input: {
+    borderRadius: 5,
+    backgroundColor: '#fcfcfd',
+    borderStyle: 'solid',
+    borderColor: '#cdced7',
+    borderWidth: 1,
+    height: 50,
+    paddingHorizontal: 10,
+  },
+  textLabel: {
+    fontSize: 16,
+    lineHeight: 19,
+    fontFamily: 'Poppins_400Regular',
+    color: '#1e1f24',
+    textAlign: 'left',
+    marginBottom: 10,
+  },
+  textEsqueceuSenha: {
+    fontSize: 12,
+    lineHeight: 14,
+    fontFamily: 'Poppins_400Regular',
+    color: '#1e1f24',
+    textAlign: 'left',
+  },
+  textCadastro: {
+    fontSize: 12,
+    lineHeight: 14,
+    fontFamily: 'Poppins_700Bold',
+    color: '#7C36CF',
+    textAlign: 'left',
+  },
+  dividerText: {
+    fontSize: 14,
+    lineHeight: 14,
+    fontFamily: 'Poppins_400Regular',
+    color: '#7c36cf',
+  },
+  socialButton: {
+    borderWidth: 1,
+    borderColor: '#DAC4FF',
+    borderRadius: 10,
+    padding: 10,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+  },
 });
+
+export default LoginScreen;
+
+
+
+
+
+

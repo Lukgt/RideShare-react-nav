@@ -88,7 +88,7 @@ export function CadastroM2Screen() {
     console.log("Dados do cadastroCompleto:", cadastroCompleto);
 
     try {
-      const response = await fetch('https://backend-rideshare.onrender.com/user/register', {
+      const response = await fetch('https://backend-rideshare.onrender.com/userMotorista/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
