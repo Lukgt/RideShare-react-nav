@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, View, Text, Image, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { ScrollView, View, Text, Image, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BotaoCarona, BotaoMotorista } from '../components/BotaoHome';
 import { BotaoPrincipal } from '../components/Botao';
-
-import CardCarona from '../components/CardCarona';
-import CardMotorista from '../components/CardMotorista';
-import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins';
 
 export function HomeScreen() {
   const [formType, setFormType] = useState('carona'); // Estado inicial: 'carona' selecionado
@@ -17,16 +13,7 @@ export function HomeScreen() {
   const [userCompany, setUserCompany] = useState(''); // Estado para armazenar a empresa do usuário
   const navigation = useNavigation();
 
-  // Carregar fontes
-  const [fontsLoaded] = useFonts({
-    Poppins_400Regular,
-    Poppins_500Medium,
-    Poppins_600SemiBold,
-    Poppins_700Bold,
-    Poppins_800ExtraBold
-  });
-
-  // Efeito para carregar nome e empresa do AsyncStorage ao carregar a tela
+  // Carregar nome e empresa do usuário ao carregar a tela
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -45,9 +32,45 @@ export function HomeScreen() {
     fetchUserData();
   }, []);
 
-  if (!fontsLoaded) {
-    return null; // Aguarda o carregamento das fontes
-  }
+  const handleProcurar = async () => {
+    let endpoint = '';
+    let alertMessage = '';
+
+    if (formType === 'carona') {
+      endpoint = 'https://backend-rideshare.onrender.com/agendamento/register';
+      alertMessage = 'Agendamento de carona criado com sucesso!';
+    } else if (formType === 'motorista') {
+      endpoint = 'https://backend-rideshare.onrender.com/agendamentoMotorista/register';
+      alertMessage = 'Agendamento de motorista criado com sucesso!';
+    }
+
+    const dadosAgendamento = {
+      userName,
+      userCompany,
+      formType,
+      numAssentos
+    };
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dadosAgendamento),
+      });
+
+      if (response.ok) {
+        Alert.alert(alertMessage);
+        navigation.navigate(formType === 'carona' ? 'modalC' : 'modalM');
+      } else {
+        Alert.alert('Erro ao criar agendamento. Tente novamente mais tarde.');
+      }
+    } catch (error) {
+      console.error('Erro ao criar agendamento:', error);
+      Alert.alert('Erro no servidor. Tente novamente mais tarde.');
+    }
+  };
 
   const incrementarAssentos = () => {
     if (numAssentos < 4) {
@@ -61,7 +84,7 @@ export function HomeScreen() {
     }
   };
 
-  // Troca de tela dos botões
+  // Função para renderizar o formulário com base no tipo selecionado (carona ou motorista)
   const renderForm = () => {
     if (formType === 'carona') {
       return (
@@ -90,7 +113,7 @@ export function HomeScreen() {
           </View>
           <BotaoPrincipal
             title='Procurar'
-            onPress={() => navigation.navigate('procurar')}
+            onPress={handleProcurar}
           />
         </View>
       );
@@ -130,14 +153,14 @@ export function HomeScreen() {
           </View>
           <BotaoPrincipal
             title='Procurar'
-            onPress={() => navigation.navigate('oferecer')}
+            onPress={handleProcurar}
           />
         </View>
       );
     }
   };
 
-  // Corpo principal
+  // Renderização principal
   return (
     <ScrollView style={{ flex: 1, backgroundColor: 'white' }}>
       <View style={styles.header}>
@@ -171,21 +194,16 @@ export function HomeScreen() {
         </Text>
       </View>
 
+      {/* Exemplo de cards */}
       <View style={{ alignItems: 'center', justifyContent: 'center', marginBottom: 20, marginTop: 20 }}>
-
         <TouchableOpacity onPress={() => navigation.navigate('modalC')}>
-          <CardCarona foto={''} nome={''} destino={''} distancia={''} tempoChegada={''} placa={''} modeloCarro={''} assentosDisponiveis={0}
-          />
+          <Text>Card de Carona</Text>
         </TouchableOpacity>
-
       </View>
-
       <View style={{ alignItems: 'center', justifyContent: 'center', marginBottom: 20, marginTop: 10 }}>
-
         <TouchableOpacity onPress={() => navigation.navigate('modalM')}>
-          <CardMotorista foto={''} nome={''} destino={''} setor={''} tempoEncontro={''} />
+          <Text>Card de Motorista</Text>
         </TouchableOpacity>
-
       </View>
 
       <StatusBar style='auto' />
@@ -299,4 +317,3 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
-
