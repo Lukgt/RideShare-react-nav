@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
     marginVertical: 20,
   },
   formContainer: {
@@ -332,6 +332,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom:10
   },
   counterContainer: {
     flexDirection: 'row',

@@ -42,20 +42,18 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     fontWeight: "500",
     color: "#fdfcff",
-    textAlign: "center"
+    textAlign: "center",
     },
 
     botao: {
     borderRadius: 5,
     backgroundColor: "#6000ac",
-    width: "100%",
+    width: "80%",
     height: 50,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 10,
-    minWidth: 343,
-    maxWidth: 343
+    padding: 10
     },
 
     textBotaoEntrar: {
@@ -69,13 +67,11 @@ const styles = StyleSheet.create({
     botaoEntrar:{
         borderRadius: 5,
         backgroundColor: "#fdfcff",
-        width: "100%",
+        width: "80%",
         height: 50,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        padding: 10,
-        minWidth: 343,
-        maxWidth: 343
+        padding: 10
     }
 });

@@ -239,13 +239,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   inputContainer: {
-    width: '100%',
+    width: '90%',
     marginBottom: 10,
   },
   buttonContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 40,
+    marginTop: 40
   },
   bottomContainer: {
     flexDirection: 'row',
