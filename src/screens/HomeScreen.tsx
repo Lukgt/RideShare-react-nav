@@ -8,8 +8,12 @@ import { BotaoPrincipal } from '../components/Botao';
 import CardCarona from '../components/CardCarona';
 import CardMotorista from '../components/CardMotorista';
 import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins'
+import { DatePicker } from '../components/DatePicker';
+
 
 export function HomeScreen() {
+
+
   const [formType, setFormType] = useState('carona'); // Estado inicial: 'carona' selecionado
   const navigation = useNavigation();
   const [numAssentos, setNumAssentos] = useState(0); // Estado inicial do número de assentos
@@ -27,7 +31,7 @@ export function HomeScreen() {
     return null;
    }
 
-
+// count
   const incrementarAssentos = () => {
     if (numAssentos < 4) {
       setNumAssentos(numAssentos + 1);
@@ -56,14 +60,16 @@ export function HomeScreen() {
             textContentType='location'
           />
           <View style={styles.row}>
-            <TextInput
+
+            <DatePicker/>
+            {/* <TextInput
               style={styles.input2}
               placeholder='Data:'
             />
             <TextInput
               style={styles.input2}
               placeholder='Hora:'
-            />
+            /> */}
           </View>
           <BotaoPrincipal
             title='Procurar'
@@ -80,14 +86,16 @@ export function HomeScreen() {
             textContentType='location'
           />
           <View style={styles.row}>
-            <TextInput
+
+            <DatePicker/>
+            {/* <TextInput
               style={styles.input2}
               placeholder='Data de partida:'
             />
             <TextInput
               style={styles.input2}
               placeholder='Hora de partida:'
-            />
+            /> */}
           </View>
           <View style={styles.counterContainer}>
             <Text style={styles.counterText}>Assentos disponíveis</Text>
@@ -140,7 +148,9 @@ export function HomeScreen() {
 
         />
       </View>
+
       {renderForm()}
+
       <View style={styles.suggestionsContainer}>
         <Text style={styles.textHome}>
           Sugestões de caronas
@@ -191,7 +201,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     backgroundColor: '#F5EEFF',
-    height: 290,
+    height: 340,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 16,

@@ -2,18 +2,79 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import axios from 'axios';
 
 interface MarkerData {
+  id: number;
+  imagem: string;
+  nome: string;
+  distancia: string;
+  Tempo: string;
+  Placa: string;
+  cor: string;
   latitude: number;
   longitude: number;
-  title: string;
-  description: string;
 }
+
+const markerData: MarkerData[] = [
+  {
+    id: 1,
+    imagem: "../assets/modelo1.png",
+    nome: "Felipe Oliveira",
+    distancia: "",
+    Tempo: "",
+    Placa: "KGM-2399 - Fiat Uno",
+    cor: "../assets/carro-cinza.png",
+    latitude: -8.05613,
+    longitude: -34.89451
+  },
+  {
+    id: 2,
+    imagem: "../assets/modelo7.png",
+    nome: "Laura Porto",
+    distancia: "",
+    Tempo: "",
+    Placa: "KXM-2367 - Nissan March",
+    cor: "../assets/carro-branco.png",
+    latitude: -8.02781,
+    longitude: -34.91897
+  },
+  {
+    id: 3,
+    imagem: "../assets/modelo6.png",
+    nome: "João Guilherme",
+    distancia: "",
+    Tempo: "",
+    Placa: "KBR-4431 - Hyuindai HB20",
+    cor: "../assets/carro-cinza.png",
+    latitude: -8.07202,
+    longitude: -34.9099
+  },
+  {
+    id: 4,
+    imagem: "../assets/modelo5.png",
+    nome: "Fernanda Feijó",
+    distancia: "",
+    Tempo: "",
+    Placa: "KBB-2110 - Renault Sandero",
+    cor: "../assets/carro-vermelho.png",
+    latitude: -8.07701,
+    longitude: -34.93097
+  },
+  {
+    id: 5,
+    imagem: "../assets/modelo4.png",
+    nome: "Bruna Maia",
+    distancia: "",
+    Tempo: "",
+    Placa: "KDW-1377 - Renault Kwid",
+    cor: "../assets/carro-preto.png",
+    latitude: -8.04709,
+    longitude: -34.95526
+  }
+];
 
 export function Mapa() {
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
-  const [markers, setMarkers] = useState<MarkerData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,18 +91,6 @@ export function Mapa() {
       setLoading(false);
     })();
   }, []);
-
-  useEffect(() => {
-    if (location) {
-      axios.get('http://localhost:3000/map/markers')
-        .then(response => {
-          setMarkers(response.data);
-        })
-        .catch(error => {
-          console.error('Erro ao buscar dados do mapa:', error);
-        });
-    }
-  }, [location]);
 
   const calcularDistancia = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Raio da Terra em quilômetros
@@ -79,15 +128,15 @@ export function Mapa() {
         }}
         showsUserLocation={true}
       >
-        {markers.map((marker, index) => (
+        {markerData.map((marker, index) => (
           <Marker
             key={index}
             coordinate={{
               latitude: marker.latitude,
               longitude: marker.longitude,
             }}
-            title={marker.title}
-            description={marker.description}
+            title={marker.nome}
+            description={marker.Placa}
           />
         ))}
       </MapView>

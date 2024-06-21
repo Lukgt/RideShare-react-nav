@@ -1,6 +1,7 @@
-import React from 'react';
-import { ScrollView,View, Text, Image, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView,View, Text, Image, StyleSheet, Linking, Alert } from 'react-native';
 import { BotaoPrincipal } from './Botao';
+import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins';
 
 
 interface ModalCaronaProps {
@@ -14,6 +15,15 @@ interface ModalCaronaProps {
   assentosDisponiveis: number;
   setor?: string;
 }
+
+
+  const generateWhatsAppLink = () => {
+    const phoneNumber = '+5511999999999'; // Substitute with the desired phone number
+    const textMessage = `Olá.`; // Substitute with the desired message
+    const url = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(textMessage)}`;
+    Linking.openURL(url)
+      .catch((err) => Alert.alert('Error opening WhatsApp:', err.message));
+  };
 
 const ModalCarona: React.FC<ModalCaronaProps> = ({
   foto,
@@ -46,7 +56,7 @@ const ModalCarona: React.FC<ModalCaronaProps> = ({
                 <Text style={styles.texto}>Assentos Disponíveis: {assentosDisponiveis}</Text>
             </View>
             <View style={{marginTop:40}}>
-                <BotaoPrincipal title={'Reservar viagem'}/>
+                <BotaoPrincipal title={'Reservar viagem'} onPress={generateWhatsAppLink}/>
             </View>
             
 
