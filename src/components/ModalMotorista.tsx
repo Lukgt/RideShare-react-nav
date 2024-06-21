@@ -1,7 +1,9 @@
-import React from 'react';
-import { ScrollView,View, Text, Image, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView,View, Text, Image, StyleSheet, Linking, Alert } from 'react-native';
 import { BotaoEntrar, BotaoPrincipal } from './Botao';
 import { BotaoCarona } from './BotaoHome';
+import{useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins';
+
 
 interface ModalMotoristaProps {
   foto: string;
@@ -11,6 +13,14 @@ interface ModalMotoristaProps {
   tempoEncontro: string;
   setor?: string;
 }
+
+  const generateWhatsAppLink = () => {
+    const phoneNumber = '+5511999999999'; // Substitute with the desired phone number
+    const textMessage = `Olá.`; // Substitute with the desired message
+    const url = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(textMessage)}`;
+    Linking.openURL(url)
+      .catch((err) => Alert.alert('Error opening WhatsApp:', err.message));
+  };
 
 const ModalMotorista: React.FC<ModalMotoristaProps> = ({
   foto,
@@ -38,7 +48,7 @@ const ModalMotorista: React.FC<ModalMotoristaProps> = ({
             </View>
             <View style={{marginTop:40, gap:20}}>
                 <Text style={styles.textoSolicitacao}>Gostaria de aceitar essa solicitação?</Text>
-                <BotaoPrincipal title={'Aceitar'}/>
+                <BotaoPrincipal title={'Aceitar'} onPress={generateWhatsAppLink}/>
                 <BotaoEntrar title={'Rejeitar'}/>
             </View>
             
@@ -93,7 +103,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
     fontWeight: "700",
-    fontFamily: "Poppins-Medium",
+    fontFamily: "Poppins-600Medium",
     color: "#3e176b",
     textAlign: "left",
     marginBottom:10

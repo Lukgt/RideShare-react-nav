@@ -227,7 +227,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    width: 336,
+    width: '100%',
+    minWidth: 343,
+    maxWidth: 343,
   },
   input2: {
     borderRadius: 5,
@@ -239,8 +241,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    minWidth: 236,
-    maxWidth: 236,
+    width:'47%'
   },
   input3: {
     borderRadius: 5,
@@ -252,7 +253,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    minWidth: 105,
-    maxWidth: 105,
+    width:'30%'
   },
 });

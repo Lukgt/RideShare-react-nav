@@ -6,7 +6,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BotaoCarona, BotaoMotorista } from '../components/BotaoHome';
 import { BotaoPrincipal } from '../components/Botao';
 
+import CardCarona from '../components/CardCarona';
+import CardMotorista from '../components/CardMotorista';
+import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold, Poppins_800ExtraBold } from '@expo-google-fonts/poppins';
+
 export function HomeScreen() {
+
+
   const [formType, setFormType] = useState('carona'); // Estado inicial: 'carona' selecionado
   const [numAssentos, setNumAssentos] = useState(0); // Estado inicial do número de assentos
   const [userName, setUserName] = useState(''); // Estado para armazenar o nome do usuário
@@ -102,14 +108,16 @@ export function HomeScreen() {
             textContentType='none' // Remove sugestões de preenchimento automático
           />
           <View style={styles.row}>
-            <TextInput
+
+            <DatePicker/>
+            {/* <TextInput
               style={styles.input2}
               placeholder='Data:'
             />
             <TextInput
               style={styles.input2}
               placeholder='Hora:'
-            />
+            /> */}
           </View>
           <BotaoPrincipal
             title='Procurar'
@@ -128,14 +136,16 @@ export function HomeScreen() {
             textContentType='none' // Remove sugestões de preenchimento automático
           />
           <View style={styles.row}>
-            <TextInput
+
+            <DatePicker/>
+            {/* <TextInput
               style={styles.input2}
               placeholder='Data de partida:'
             />
             <TextInput
               style={styles.input2}
               placeholder='Hora de partida:'
-            />
+            /> */}
           </View>
           <View style={styles.counterContainer}>
             <Text style={styles.counterText}>Assentos disponíveis</Text>
@@ -187,7 +197,9 @@ export function HomeScreen() {
           isSelected={formType === 'motorista'} // Verifica se 'motorista' está selecionado
         />
       </View>
+
       {renderForm()}
+
       <View style={styles.suggestionsContainer}>
         <Text style={styles.textHome}>
           Sugestões de caronas
@@ -232,7 +244,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     backgroundColor: '#F5EEFF',
-    height: 290,
+    height: 340,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 16,

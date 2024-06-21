@@ -258,13 +258,11 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderColor: '#cdced7',
     borderWidth: 1,
-    width: 228,
+    width: '47%',
     height: 50,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    minWidth: 228,
-    maxWidth: 228,
+    padding: 10
   },
   input3: {
     borderRadius: 5,
@@ -272,13 +270,11 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderColor: '#cdced7',
     borderWidth: 1,
-    width: 100,
+    width: '30%',
     height: 50,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    minWidth: 100,
-    maxWidth: 100,
+    padding: 10
   },
   fileInput: {
     backgroundColor: '#d8d9e0',
